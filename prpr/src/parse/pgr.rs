@@ -219,6 +219,7 @@ fn parse_judge_line(pgr: PgrJudgeLine, max_time: f32) -> Result<JudgeLine> {
         notes,
         color: Anim::default(),
         parent: None,
+        anchor: [0.5, 0.5],
         z_index: 0,
         show_below: true,
         attach_ui: None,
