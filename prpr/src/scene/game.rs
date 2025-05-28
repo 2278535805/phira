@@ -123,7 +123,6 @@ pub struct GameScene {
     pub gl: InternalGlContext<'static>,
     player: Option<BasicPlayer>,
     chart_bytes: Vec<u8>,
-    chart_format: ChartFormat,
     info_offset: f32,
     effects: Vec<Effect>,
 
@@ -248,6 +247,7 @@ impl GameScene {
         let info_offset = info.offset;
         let mut res = Resource::new(
             config,
+            chart_format,
             info,
             fs,
             player.as_ref().and_then(|it| it.avatar.clone()),
@@ -281,7 +281,6 @@ impl GameScene {
             gl: unsafe { get_internal_gl() },
             player,
             chart_bytes,
-            chart_format,
             effects,
             info_offset,
 
@@ -367,7 +366,6 @@ impl GameScene {
             }
         }
         ui.alpha(res.alpha, |ui| {
-            ui.text("MAGIC BUGFIX TEXT").color(Color::new(0., 0., 0., 0.)).draw();
             if tm.now() as f32 - self.pause_first_time <= PAUSE_CLICK_INTERVAL {
                 ui.fill_circle(pause_center.x, pause_center.y, 0.05, Color::new(1., 1., 1., 0.5));
             }
@@ -429,8 +427,6 @@ impl GameScene {
                             .draw_using(&PGR_FONT);
                     });
             }
-            // magic to make score visible, refer to phira/src/rate.rs#L219
-            ui.text("").draw_using(&PGR_FONT);
             let lf = -1. + margin;
             let bt = -top - eps * 2.8 + (1. - p) * 0.4;
             let ct = ui.text(&res.info.name).measure().center();
@@ -452,7 +448,7 @@ impl GameScene {
 
             let hw = 0.003;
             let height = eps * 1.2;
-            let dest = 2. * res.time / res.track_length;
+            let dest = (2. * res.time / res.track_length).max(0.).min(2.);
             ui.fill_rect(Rect::new(-1., top, dest, height), semi_white(0.6));
             ui.fill_rect(Rect::new(-1. + dest - hw, top, hw * 2., height), WHITE);
         });
